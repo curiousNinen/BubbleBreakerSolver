@@ -1,1 +1,5 @@
-Readme file for this project. Dunno what to do with it yet. 
+Compile with:
+g++ BubbleBreak.cpp 
+
+Maybe will add make file for it later? make it easier? (Also, possibly add -o3? -o4? some level of optimization, are those the same? meh)
+
