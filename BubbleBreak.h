@@ -10,7 +10,7 @@
 
 static const int WIDTH = 10;
 static const int HEIGHT = 10;
-static const int DIFFPIECE = 2;
+static const int DIFFPIECE = 5;
 
 
 // This function calculates and returns the points that would be earned
@@ -44,3 +44,16 @@ bool gameOver(int board[HEIGHT][WIDTH]);
 // This function copies the board in "copyMe" into "newBoard". Will be useful when writing
 // game engines that solve and you need a "master" original board.
 void copyBoard(int newBoard[HEIGHT][WIDTH], int copyMe[HEIGHT][WIDTH]);
+
+// This will play a game that is described by the "moves" list. And will return the score.
+int playGame(int board[HEIGHT][WIDTH], int moves[HEIGHT*WIDTH/2][2]);
+
+// This prints out the move list in ordered pairs (x,y);
+void printMoves(int moves[HEIGHT*WIDTH/2][2]);
+
+// Random Engine! will calculate numGames of solutions, and will remember the best solution
+// which will be placed into the moves array.
+// Use this as a template for making engines. always include board and moves. when finished move
+// array is changed, but the board remains unchanged.
+void randomEngine(int board[HEIGHT][WIDTH], int moves[HEIGHT*WIDTH/2][2], int numGames);
+

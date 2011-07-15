@@ -8,6 +8,7 @@
  ************************************************************/
 
 #include <iostream>
+#include <time.h>
 #include "BubbleBreak.h"
 
 using namespace std;
@@ -17,22 +18,40 @@ int main(int argc, char *argv[])
 	srand(0); // seed goes here. For now, set to 0. 
 	
 	int bubbleBoard[HEIGHT][WIDTH]; // The board.
+	int moves[HEIGHT*WIDTH/2][2];
 	initBoard(bubbleBoard,DIFFPIECE); // Initailize the board. 
 	
-	int score=0; // Start with 0 score... obviously
-	
-	while(!gameOver(bubbleBoard)) // this code is just to "play" the game. should be obvious on reading.
-	{
-		printBoard(bubbleBoard);
-		int x,y;
-		cout<<"x:";
-		cin>>x;
-		cout<<"y:";
-		cin>>y;
-		score+=removeBlock(bubbleBoard,x,y);
-		cout<<"Score:"<<score<<endl;
-	}
+	randomEngine(bubbleBoard,moves,50000);
+
+	printMoves(moves);
+	cout<<"Score:"<<playGame(bubbleBoard,moves)<<endl;
 }
+
+
+/*	for(int i = 10; i<1000; i++) // This produces the graph of how good the randomEngine is...
+ {
+ clock_t t1=clock();
+ randomEngine(bubbleBoard, moves, i);
+ clock_t t2=clock();
+ cout<<i<<","<<(t2-t1)/(double)CLOCKS_PER_SEC<<","<<playGame(bubbleBoard,moves)<<endl;
+ }*/ 
+
+
+/*	
+ 
+ while(!gameOver(bubbleBoard)) // this code is just to "play" the game. should be obvious on reading.
+ {
+	printBoard(bubbleBoard);
+	int x,y;
+	cout<<"x:";
+	cin>>x;
+	cout<<"y:";
+	cin>>y;
+	score+=removeBlock(bubbleBoard,x,y);
+	cout<<"Score:"<<score<<endl;
+ }
+ 
+ */
 
 void initBoard(int board[HEIGHT][WIDTH], int options) 
 {
@@ -188,4 +207,69 @@ int cleanBoard(int board[HEIGHT][WIDTH])
 			if(lookAt==-1)
 				j=-1;
 		}
+}
+
+int playGame(int board[HEIGHT][WIDTH], int moves[HEIGHT*WIDTH/2][2])
+{
+	int score = 0;
+	int tempBoard[HEIGHT][WIDTH];
+	
+	copyBoard(tempBoard,board);
+	
+	for(int i=0; (i<HEIGHT*WIDTH/2)&&(!gameOver(tempBoard)); i++)
+		score += removeBlock(tempBoard, moves[i][0],moves[i][1]);
+	
+	return score;
+}
+
+
+void printMoves(int moves[HEIGHT*WIDTH/2][2])
+{
+	for(int i=0; i<HEIGHT*WIDTH/2; i++)
+		if(moves[i][0] == -1) 
+			break;
+		else
+			cout<<"("<<moves[i][0]<<","<<moves[i][1]<<")\n";
+}
+
+void randomEngine(int board[HEIGHT][WIDTH], int moves[HEIGHT*WIDTH/2][2], int numGames)
+{
+	int bestScore =0;
+	int tempBoard[HEIGHT][WIDTH];
+	int tempMoves[HEIGHT*WIDTH/2][2];
+	
+	for(int i=0; i<numGames; i++)
+	{
+		copyBoard(tempBoard,board);
+		int k = 0;
+		int gameScore = 0;
+		
+		for(int i=0; i<HEIGHT*WIDTH/2; i++) // intialize to no moves.
+			tempMoves[i][0] = tempMoves[i][1] = -1;
+		
+		while(!gameOver(tempBoard)) // could run forever... should probably make it select a non 0.
+		{
+			int randX = rand()%WIDTH; // should update the height and width depending on how many are left.
+			int randY = rand()%HEIGHT;
+			
+			int scoreMove = removeBlock(tempBoard,randX,randY);
+			if(scoreMove!=0)
+			{
+				tempMoves[k][0] = randX;
+				tempMoves[k][1] = randY;
+				k++;
+				gameScore+=scoreMove;
+			}
+		}
+		
+		if(gameScore> bestScore)
+		{
+			bestScore = gameScore;
+			for(int i=0; i<HEIGHT*WIDTH/2; i++)
+			{
+				moves[i][0] = tempMoves[i][0];
+				moves[i][1] = tempMoves[i][1];
+			}
+		}
+	}
 }
